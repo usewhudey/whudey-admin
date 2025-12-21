@@ -1,0 +1,331 @@
+// app/sellers/[id]/page.tsx
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
+import { useGetSellerDetailsQuery } from '@/features/sellers/sellersApi';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { Button } from '@/components/ui/button';
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  Calendar,
+  Package,
+  DollarSign,
+  Eye,
+  ShoppingCart,
+  MapPin,
+  Globe,
+  Shield,
+} from 'lucide-react';
+import { formatDistanceToNow, format } from 'date-fns';
+
+export default function SellerDetailsPage() {
+  const params = useParams();
+  const router = useRouter();
+  const sellerId = params.id as string;
+
+  const { data, isLoading, error } = useGetSellerDetailsQuery(sellerId);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (error || !data?.data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 text-lg font-semibold">
+            Failed to load seller details
+          </p>
+          <Button onClick={() => router.back()} className="mt-4">
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const { seller, store, statistics, loginHistory, topProducts } = data.data;
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <Button variant="ghost" onClick={() => router.back()}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Sellers
+          </Button>
+        </div>
+
+        {/* Seller Profile Card */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
+          <div className="flex items-start gap-6">
+            <div className="flex-shrink-0">
+              {seller.avatar ? (
+                <img
+                  src={seller.avatar}
+                  alt={`${seller.firstName} ${seller.lastName}`}
+                  className="w-24 h-24 rounded-full"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center">
+                  <span className="text-purple-600 font-bold text-2xl">
+                    {seller.firstName[0]}
+                    {seller.lastName[0]}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {seller.firstName} {seller.lastName}
+                </h1>
+                <span
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    seller.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : seller.status === 'suspended'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {seller.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Mail className="w-4 h-4" />
+                  {seller.email}
+                  {seller.isEmailVerified && (
+                    <Shield className="w-4 h-4 text-green-500" />
+                  )}
+                </div>
+
+                {seller.phone && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Phone className="w-4 h-4" />
+                    {seller.phone}
+                    {seller.isPhoneVerified && (
+                      <Shield className="w-4 h-4 text-green-500" />
+                    )}
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  Joined{' '}
+                  {formatDistanceToNow(new Date(seller.createdAt), {
+                    addSuffix: true,
+                  })}
+                </div>
+
+                {seller.lastLoginAt && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Calendar className="w-4 h-4" />
+                    Last login{' '}
+                    {formatDistanceToNow(new Date(seller.lastLoginAt), {
+                      addSuffix: true,
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Store Info & Statistics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Store Card */}
+          <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Store Information
+            </h2>
+
+            {store.logo && (
+              <img
+                src={store.logo}
+                alt={store.storeName}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-500">Store Name</p>
+                <p className="font-medium text-gray-900">{store.storeName}</p>
+              </div>
+
+              {store.slug && (
+                <div>
+                  <p className="text-sm text-gray-500">Store URL</p>
+                  <a
+                    href={`https://whudey.com/${store.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-600 hover:underline flex items-center gap-1"
+                  >
+                    <Globe className="w-4 h-4" />
+                    whudey.com/{store.slug}
+                  </a>
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm text-gray-500">Description</p>
+                <p className="text-gray-900">{store.description}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500">Subscription</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      store.subscription.tier === 'paid'
+                        ? 'bg-green-100 text-green-800'
+                        : store.subscription.tier === 'premium'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {store.subscription.tier.toUpperCase()}
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    ({store.subscription.productLimit} products limit)
+                  </span>
+                </div>
+              </div>
+
+              {store.physicalLocation && store.physicalLocation !== 'none' && (
+                <div>
+                  <p className="text-sm text-gray-500">Location</p>
+                  <div className="flex items-center gap-1 text-gray-900">
+                    <MapPin className="w-4 h-4" />
+                    {store.physicalLocation}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Statistics Card */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Statistics</h2>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="w-5 h-5 text-purple-500" />
+                  <span className="text-sm text-gray-600">Products</span>
+                </div>
+                <span className="text-lg font-bold text-gray-900">
+                  {store.productCount}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5 text-blue-500" />
+                  <span className="text-sm text-gray-600">Total Orders</span>
+                </div>
+                <span className="text-lg font-bold text-gray-900">
+                  {store.totalOrders}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-gray-600">Total Revenue</span>
+                </div>
+                <span className="text-lg font-bold text-gray-900">
+                  ₦{store.totalRevenue.toLocaleString()}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-orange-500" />
+                  <span className="text-sm text-gray-600">Total Views</span>
+                </div>
+                <span className="text-lg font-bold text-gray-900">
+                  {store.totalViews}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Products & Login History */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Products */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Products</h2>
+
+            {topProducts && topProducts.length > 0 ? (
+              <div className="space-y-4">
+                {topProducts.map(product => (
+                  <div
+                    key={product._id}
+                    className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg"
+                  >
+                    {product.images[0] && (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{product.name}</p>
+                      <p className="text-sm text-gray-600">
+                        ₦{product.price.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No products yet</p>
+            )}
+          </div>
+
+          {/* Login History */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Recent Login History
+            </h2>
+
+            {loginHistory && loginHistory.length > 0 ? (
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {loginHistory.slice(0, 5).map(login => (
+                  <div
+                    key={login._id}
+                    className="p-3 border border-gray-200 rounded-lg"
+                  >
+                    <p className="text-sm text-gray-600 truncate">
+                      {login.userAgent}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {format(new Date(login.createdAt), 'PPpp')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No login history</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
