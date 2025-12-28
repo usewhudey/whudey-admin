@@ -5,22 +5,14 @@ export const useAuth = () => {
     state => state.auth
   );
 
-  // if (isLoading) {
-  //   // Return the basic state while loading
-  //   return {
-  //     isLoading: true,
-  //   };
-  // }
-
   const currentUser = user;
-
-  // console.log('current user 2', currentUser);
 
   return {
     user,
     isAuthenticated,
     isLoading,
-    isAdmin: currentUser?.role === 'admin',
+    isAdmin:
+      currentUser?.role === 'admin' || currentUser?.role === 'superadmin',
     isSeller: currentUser?.role === 'seller',
     isEmailVerified: currentUser?.isEmailVerified || false,
   };
