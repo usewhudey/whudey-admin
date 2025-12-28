@@ -216,7 +216,7 @@ export default function SellerDetailsPage() {
                 Reset Password
               </Button>
 
-              {user.role === 'superadmin' && (
+              {user?.role === 'superadmin' && (
                 <Button
                   variant="outline"
                   onClick={() => setMakeAdminModal(true)}
@@ -226,8 +226,6 @@ export default function SellerDetailsPage() {
                   Make Admin
                 </Button>
               )}
-
-        
 
               <Button
                 variant="outline"
