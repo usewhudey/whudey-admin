@@ -9,7 +9,7 @@ import {
   Menu,
   User,
   LogOut,
-  Settings,
+  
 } from 'lucide-react';
 
 import {
@@ -92,16 +92,6 @@ export function DashboardTopBar() {
                 >
                   <User size={16} />
                   Profile Settings
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/dashboard/storefront"
-                  className="flex items-center gap-2"
-                >
-                  <Settings size={16} />
-                  Store Settings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

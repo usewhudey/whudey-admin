@@ -24,7 +24,7 @@ export function SellerFilters({ onFilterChange }: SellerFiltersProps) {
     signupDateTo: '',
     lastLoginFrom: '',
     lastLoginTo: '',
-    sortBy: 'createdAt',
+    sortBy: 'newest',
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +43,7 @@ export function SellerFilters({ onFilterChange }: SellerFiltersProps) {
       signupDateTo: '',
       lastLoginFrom: '',
       lastLoginTo: '',
-      sortBy: 'createdAt',
+      sortBy: 'newest',
     };
     setFilters(clearedFilters);
     onFilterChange(clearedFilters);
@@ -93,17 +93,13 @@ export function SellerFilters({ onFilterChange }: SellerFiltersProps) {
             <select
               value={filters.subscription || ''}
               onChange={e =>
-                handleFilterChange(
-                  'subscription',
-                  e.target.value || undefined
-                )
+                handleFilterChange('subscription', e.target.value || undefined)
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="">All</option>
+              <option value="all">All</option>
               <option value="free">Free</option>
               <option value="paid">Paid</option>
-              <option value="premium">Premium</option>
             </select>
           </div>
 
@@ -122,7 +118,7 @@ export function SellerFilters({ onFilterChange }: SellerFiltersProps) {
               <option value="">All</option>
               <option value="active">Active</option>
               <option value="suspended">Suspended</option>
-              <option value="inactive">Inactive</option>
+              <option value="deleted">Deleted</option>
             </select>
           </div>
 
@@ -136,10 +132,10 @@ export function SellerFilters({ onFilterChange }: SellerFiltersProps) {
               onChange={e => handleFilterChange('sortBy', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="createdAt">Signup Date</option>
-              <option value="lastLoginAt">Last Login</option>
-              <option value="firstName">Name</option>
-              <option value="productCount">Product Count</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="most_products">Most Product</option>
+              <option value="most_revenue">Most Revenue</option>
             </select>
           </div>
 

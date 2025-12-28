@@ -3,6 +3,8 @@
 // ==========================================
 
 export interface Seller {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  store?: any;
   _id: string;
   firstName: string;
   lastName: string;

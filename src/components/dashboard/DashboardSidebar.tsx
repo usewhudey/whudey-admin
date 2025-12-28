@@ -30,28 +30,24 @@ const menuItems = [
     icon: LayoutDashboard,
     href: '/dashboard',
     subItems: null,
-   
   },
   {
     label: 'Sellers',
     icon: Package,
     href: '/dashboard/sellers',
     subItems: null,
-   
   },
   {
     label: 'Orders',
     icon: ShoppingBag,
     href: '/dashboard/orders',
     subItems: null,
-    
   },
   {
     label: 'Analytics',
     icon: BarChart3,
     href: '/dashboard/analytics',
     subItems: null,
-   
   },
   {
     label: 'Store Settings',
@@ -67,44 +63,37 @@ const menuItems = [
         href: '/dashboard/store-settings/category',
       },
     ],
-   
   },
   {
     label: 'Activities',
     icon: Activity,
     href: '/dashboard/activities',
     subItems: null,
-   
   },
   {
     label: 'Profile Settings',
     icon: Settings,
     href: '/dashboard/settings',
     subItems: null,
-    
   },
   {
     label: 'Subscription',
     icon: CreditCard,
     href: '/dashboard/subscription',
     subItems: null,
-   
   },
   {
     label: 'Support',
     icon: SmilePlus,
     href: '/dashboard/support',
     subItems: null,
-    
   },
 ];
-
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { isSidebarOpen, closeSidebar, toggleSidebar } = useUIStore();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-
 
   const mobileWidth = 'w-64';
   const desktopWidth = isSidebarOpen ? 'lg:w-64' : 'lg:w-20';
@@ -120,7 +109,6 @@ export function DashboardSidebar() {
     icon: ComponentType<any>;
     href: string;
     subItems?: SubItem[] | null;
-
   };
 
   interface NavItemProps {
@@ -131,12 +119,7 @@ export function DashboardSidebar() {
     Icon: ComponentType<any>;
   }
 
-  const NavItem = ({
-    item,
-    isActive,
-    isSubmenuOpen,
-    Icon,
-  }: NavItemProps) => {
+  const NavItem = ({ item, isActive, isSubmenuOpen, Icon }: NavItemProps) => {
     const hasSubItems = !!(item.subItems && item.subItems.length > 0);
 
     if (!hasSubItems) {
@@ -297,12 +280,9 @@ export function DashboardSidebar() {
           </button>
         </div>
 
-
         {/* Navigation */}
         <nav className="p-4 space-y-1">
           {menuItems.map(item => {
-           
-
             const isSubItemActive = !!item.subItems?.some(sub =>
               pathname?.startsWith(sub.href)
             );
@@ -331,7 +311,6 @@ export function DashboardSidebar() {
                   isActive={isActive}
                   isSubmenuOpen={isSubItemActive || isSubmenuOpen}
                   Icon={Icon}
-                 
                 />
               </div>
             );

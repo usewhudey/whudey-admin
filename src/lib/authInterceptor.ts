@@ -38,8 +38,8 @@ export const useAuthInterceptor = () => {
     const refreshAuthToken = async (): Promise<boolean> => {
       try {
         const response = await fetch(`${APP_CONFIG.apiBaseUrl}/auth/refresh`, {
-          method: 'POST',
-          credentials: 'include', // Important: Include cookies
+          method: 'GET',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -49,7 +49,8 @@ export const useAuthInterceptor = () => {
           console.log('✅ Token refreshed successfully');
           return true;
         }
-        console.log('❌ Token refresh failed:', response.status);
+
+        console.log('❌ Token refresh failed with status:', response.status);
         return false;
       } catch (error) {
         console.error('❌ Token refresh error:', error);
@@ -57,16 +58,17 @@ export const useAuthInterceptor = () => {
       }
     };
 
-    // Intercept fetch globally
+    // Store original fetch
     const originalFetch = window.fetch;
 
+    // Intercept fetch globally
     window.fetch = async (...args) => {
       const [resource, config] = args;
 
-      // First attempt
-      let response = await originalFetch(resource, config);
+      // Make initial request
+      const response = await originalFetch(resource, config);
 
-      // If 401 Unauthorized, try to refresh token
+      // Handle 401 Unauthorized
       if (response.status === 401) {
         const url = (() => {
           if (typeof resource === 'string') return resource;
@@ -75,60 +77,78 @@ export const useAuthInterceptor = () => {
           return String(resource);
         })();
 
-        // Don't retry on auth endpoints
+        // Skip auth endpoints
         if (
           url.includes('/auth/login') ||
+          url.includes('/auth/register') ||
           url.includes('/auth/refresh') ||
           url.includes('/auth/logout')
         ) {
           return response;
         }
 
-        
+        console.log('🔄 Got 401 for:', url);
 
-        // Handle token refresh with queue
+        // If not already refreshing, start refresh
         if (!isRefreshing) {
           isRefreshing = true;
+          console.log('🔄 Starting token refresh...');
 
           try {
             const refreshSuccess = await refreshAuthToken();
 
             if (refreshSuccess) {
-              console.log('✅ Token refresh successful, retrying request...');
-              processQueue();
-              isRefreshing = false;
+              console.log('✅ Token refresh successful, processing queue...');
+              processQueue(); // Resolve all queued promises
 
-              // Retry original request
-              response = await originalFetch(resource, config);
-              return response;
+              // Retry the original request
+              const retryResponse = await originalFetch(resource, config);
+              console.log('✅ Retried request, status:', retryResponse.status);
+
+              isRefreshing = false;
+              return retryResponse;
             } else {
-              // Refresh failed - logout user
-              console.log('❌ Refresh failed, logging out...');
+              // Refresh failed - logout
+              console.log('❌ Token refresh failed, logging out...');
               processQueue(new Error('Token refresh failed'));
-              isRefreshing = false;
 
+              // Clear state and redirect
               dispatch(clearUser());
-              router.push('/');
-              return response;
+
+              // Small delay to ensure state is cleared
+              setTimeout(() => {
+                router.push('/');
+              }, 100);
+
+              isRefreshing = false;
+              return response; // Return original 401
             }
           } catch (error) {
-            console.error('❌ Refresh error:', error);
+            console.error('❌ Token refresh exception:', error);
             processQueue(error);
-            isRefreshing = false;
 
             dispatch(clearUser());
-            router.push('/');
+            setTimeout(() => {
+              router.push('/');
+            }, 100);
+
+            isRefreshing = false;
             return response;
           }
-        }
+        } else {
+          // Already refreshing - queue this request
+          console.log('⏳ Token refresh in progress, queueing request...');
 
-        // If already refreshing, queue this request
-        console.log('⏳ Token refresh in progress, queueing request...');
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => originalFetch(resource, config))
-          .catch(() => response);
+          return new Promise<Response>((resolve, reject) => {
+            failedQueue.push({
+              resolve: () => {
+                // When queue is processed, retry the request
+                originalFetch(resource, config).then(resolve).catch(reject);
+              },
+              reject,
+            });
+          });
+        }
       }
 
       return response;

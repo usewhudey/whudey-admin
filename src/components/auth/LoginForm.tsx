@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'; // 🎯 NEW: Add Mail and Lock icons
-import { ApiError } from '@/types';
+import { ApiError } from '@/types/api';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address.'), // 🎯 Sharper error message
@@ -51,12 +51,9 @@ export default function LoginPage() {
     }
   };
 
-
   return (
     <div className="bg-white rounded-xl p-6 sm:p-8 ">
-      <div className="text-center mb-8">
-     
-      </div>
+      <div className="text-center mb-8"></div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Email */}
@@ -110,7 +107,6 @@ export default function LoginPage() {
           )}
         </div>
 
-
         {/* Submit Button */}
         <Button
           type="submit"
@@ -120,7 +116,6 @@ export default function LoginPage() {
           {isLoading ? <LoadingSpinner size="sm" /> : 'Sign In'}
         </Button>
       </form>
-
     </div>
   );
 }

@@ -1,7 +1,4 @@
-// ==========================================
 // components/sellers/SellersTable.tsx
-// ==========================================
-
 'use client';
 
 import { useState } from 'react';
@@ -14,9 +11,7 @@ import {
   Ban,
   CheckCircle,
   Trash2,
-  Mail,
   Key,
-  Shield,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -24,7 +19,7 @@ interface SellersTableProps {
   sellers: Seller[];
   onSuspend: (sellerId: string) => void;
   onUnsuspend: (sellerId: string) => void;
-  onDelete: (sellerId: string) => void;
+  onDelete: (sellerId: string, sellerName: string) => void;
   onResetPassword: (sellerId: string) => void;
   onMakeAdmin: (sellerId: string) => void;
 }
@@ -35,7 +30,7 @@ export function SellersTable({
   onUnsuspend,
   onDelete,
   onResetPassword,
-  onMakeAdmin,
+
 }: SellersTableProps) {
   const router = useRouter();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -76,6 +71,9 @@ export function SellersTable({
                 Products
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Tier
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Signup Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -91,8 +89,9 @@ export function SellersTable({
               <tr key={seller._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
+                    <div className="shrink-0 h-10 w-10">
                       {seller.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           className="h-10 w-10 rounded-full"
                           src={seller.avatar}
@@ -131,6 +130,11 @@ export function SellersTable({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {seller.store.tier}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">
                     {formatDistanceToNow(new Date(seller.createdAt), {
                       addSuffix: true,
@@ -151,9 +155,7 @@ export function SellersTable({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        router.push(`/sellers/${seller._id}`)
-                      }
+                      onClick={() => router.push(`/dashboard/sellers/${seller._id}`)}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -180,7 +182,7 @@ export function SellersTable({
                                   onSuspend(seller._id);
                                   setOpenMenuId(null);
                                 }}
-                                className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50 w-full"
+                                className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50 w-full text-left"
                               >
                                 <Ban className="w-4 h-4 mr-2" />
                                 Suspend
@@ -191,7 +193,7 @@ export function SellersTable({
                                   onUnsuspend(seller._id);
                                   setOpenMenuId(null);
                                 }}
-                                className="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-gray-50 w-full"
+                                className="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-gray-50 w-full text-left"
                               >
                                 <CheckCircle className="w-4 h-4 mr-2" />
                                 Unsuspend
@@ -203,29 +205,22 @@ export function SellersTable({
                                 onResetPassword(seller._id);
                                 setOpenMenuId(null);
                               }}
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full"
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left"
                             >
                               <Key className="w-4 h-4 mr-2" />
                               Reset Password
                             </button>
 
-                            <button
-                              onClick={() => {
-                                onMakeAdmin(seller._id);
-                                setOpenMenuId(null);
-                              }}
-                              className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-50 w-full"
-                            >
-                              <Shield className="w-4 h-4 mr-2" />
-                              Make Admin
-                            </button>
 
                             <button
                               onClick={() => {
-                                onDelete(seller._id);
+                                onDelete(
+                                  seller._id,
+                                  `${seller.firstName} ${seller.lastName}`
+                                );
                                 setOpenMenuId(null);
                               }}
-                              className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50 w-full"
+                              className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50 w-full text-left"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
                               Delete Permanently
