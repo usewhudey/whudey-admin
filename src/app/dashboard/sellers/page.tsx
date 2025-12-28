@@ -101,7 +101,7 @@ export default function SellersPage() {
 
     try {
       await unsuspendSeller(unsuspendModal.sellerId).unwrap();
-      success('Seller unsuspended successfully');
+      success('Seller unsuspend successfully');
       setUnsuspendModal({ isOpen: false, sellerId: null });
     } catch (err) {
       showError('Failed to unsuspend seller');
