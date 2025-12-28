@@ -13,12 +13,12 @@ import {
   ShieldAlert,
   Ban,
   CheckCircle,
-  UserX,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import AdminActionsMenu from './AdminActionsMenu';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AdminsTableProps {
   admins: Admin[];
@@ -31,8 +31,13 @@ interface AdminsTableProps {
   onPageChange: (page: number) => void;
 }
 
-export default function AdminsTable({ admins, pagination, onPageChange }: AdminsTableProps) {
+export default function AdminsTable({
+  admins,
+  pagination,
+  onPageChange,
+}: AdminsTableProps) {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const getRoleBadge = (role: AdminRole) => {
     if (role === AdminRole.SUPERADMIN) {
@@ -92,9 +97,11 @@ export default function AdminsTable({ admins, pagination, onPageChange }: Admins
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Joined
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              {user.role === 'superadmin' && (
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -106,13 +113,14 @@ export default function AdminsTable({ admins, pagination, onPageChange }: Admins
                     className="flex items-center gap-3 group"
                   >
                     {admin.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={admin.avatar}
                         alt={admin.name || admin.email}
                         className="w-10 h-10 rounded-full"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
                         {(admin.name || admin.email)[0].toUpperCase()}
                       </div>
                     )}
@@ -124,40 +132,57 @@ export default function AdminsTable({ admins, pagination, onPageChange }: Admins
                     </div>
                   </Link>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{getRoleBadge(admin.role)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(admin.status)}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {getRoleBadge(admin.role)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {getStatusBadge(admin.status)}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm">
-                    <p className="font-medium text-gray-900">{admin.activityCount || 0} actions</p>
+                    <p className="font-medium text-gray-900">
+                      {admin.activityCount || 0} actions
+                    </p>
                     {admin.lastActivity && (
                       <p className="text-gray-500">
-                        {formatDistanceToNow(new Date(admin.lastActivity), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(admin.lastActivity), {
+                          addSuffix: true,
+                        })}
                       </p>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {formatDistanceToNow(new Date(admin.lastLoginAt), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(admin.lastLoginAt), {
+                    addSuffix: true,
+                  })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                   {new Date(admin.createdAt).toLocaleDateString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <div className="relative">
-                    <button
-                      onClick={() => setActiveMenuId(activeMenuId === admin.id ? null : admin.id)}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <MoreVertical className="w-5 h-5 text-gray-600" />
-                    </button>
-                    {activeMenuId === admin.id && (
-                      <AdminActionsMenu
-                        admin={admin}
-                        onClose={() => setActiveMenuId(null)}
-                      />
-                    )}
-                  </div>
-                </td>
+
+                {user.role === 'superadmin' && (
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className="relative">
+                      <button
+                        onClick={() =>
+                          setActiveMenuId(
+                            activeMenuId === admin.id ? null : admin.id
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <MoreVertical className="w-5 h-5 text-gray-600" />
+                      </button>
+                      {activeMenuId === admin.id && (
+                        <AdminActionsMenu
+                          admin={admin}
+                          onClose={() => setActiveMenuId(null)}
+                        />
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -168,8 +193,8 @@ export default function AdminsTable({ admins, pagination, onPageChange }: Admins
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <div className="text-sm text-gray-600">
             Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{' '}
-            admins
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+            {pagination.total} admins
           </div>
           <div className="flex items-center gap-2">
             <button

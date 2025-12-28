@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { useGetAdminsQuery } from '@/features/admins/adminsApi';
-import { AdminRole, AdminStatus, type AdminFilters } from '@/types/admin';
+import { type AdminFilters } from '@/types/admin';
 
 import { Loader2, Users, Activity } from 'lucide-react';
 import AdminFiltersBar from '@/components/dashboard/admins/AdminFiltersBar';

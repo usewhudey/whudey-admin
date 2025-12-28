@@ -11,14 +11,19 @@ import {
 } from '@/features/admins/adminsApi';
 import { Ban, CheckCircle, UserX, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/useToast';
 
 interface AdminActionsMenuProps {
   admin: Admin;
   onClose: () => void;
 }
 
-export default function AdminActionsMenu({ admin, onClose }: AdminActionsMenuProps) {
+export default function AdminActionsMenu({
+  admin,
+  onClose,
+}: AdminActionsMenuProps) {
+  const { success, error: showError } = useToast();
+
   const router = useRouter();
   const [toggleStatus] = useToggleAdminStatusMutation();
   const [changeToSeller] = useChangeAdminToSellerMutation();
@@ -26,30 +31,36 @@ export default function AdminActionsMenu({ admin, onClose }: AdminActionsMenuPro
   const handleToggleStatus = async () => {
     try {
       const newStatus =
-        admin.status === AdminStatus.ACTIVE ? AdminStatus.SUSPENDED : AdminStatus.ACTIVE;
+        admin.status === AdminStatus.ACTIVE
+          ? AdminStatus.SUSPENDED
+          : AdminStatus.ACTIVE;
       await toggleStatus({
         adminId: admin.id,
         payload: { status: newStatus },
       }).unwrap();
-      toast.success(
+      success(
         `Admin ${newStatus === AdminStatus.SUSPENDED ? 'suspended' : 'activated'} successfully`
       );
       onClose();
     } catch (error) {
-      toast.error('Failed to update admin status');
+      showError('Failed to update admin status');
     }
   };
 
   const handleChangeToSeller = async () => {
-    if (!confirm('Are you sure you want to change this admin to a seller? This action cannot be undone.')) {
+    if (
+      !confirm(
+        'Are you sure you want to change this admin to a seller? This action cannot be undone.'
+      )
+    ) {
       return;
     }
     try {
       await changeToSeller(admin.id).unwrap();
-      toast.success('Admin changed to seller successfully');
+      success('Admin changed to seller successfully');
       onClose();
     } catch (error) {
-      toast.error('Failed to change admin role');
+      showError('Failed to change admin role');
     }
   };
 

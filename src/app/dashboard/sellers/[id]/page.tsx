@@ -39,8 +39,11 @@ import { DeleteSellerModal } from '@/components/dashboard/sellers/modals/DeleteS
 import { SuspendSellerModal } from '@/components/dashboard/sellers/modals/SuspendSellerModal';
 import { ConfirmModal } from '@/components/dashboard/sellers/modals/ConfirmModal';
 import { GrantSubscriptionModal } from '@/components/dashboard/sellers/modals/GrantSubscriptionModal';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SellerDetailsPage() {
+  const { user } = useAuth();
+
   const params = useParams();
   const router = useRouter();
   const { success, error: showError } = useToast();
@@ -213,14 +216,18 @@ export default function SellerDetailsPage() {
                 Reset Password
               </Button>
 
-              <Button
-                variant="outline"
-                onClick={() => setMakeAdminModal(true)}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <UserCog className="w-4 h-4 mr-2" />
-                Make Admin
-              </Button>
+              {user.role === 'superadmin' && (
+                <Button
+                  variant="outline"
+                  onClick={() => setMakeAdminModal(true)}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <UserCog className="w-4 h-4 mr-2" />
+                  Make Admin
+                </Button>
+              )}
+
+        
 
               <Button
                 variant="outline"

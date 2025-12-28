@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/useToast';
 import { useUIStore } from '@/store/useUIStore';
 import {
   Menu,
-  User,
   LogOut,
   
 } from 'lucide-react';
@@ -21,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Link from 'next/link';
 
 export function DashboardTopBar() {
   const router = useRouter();
@@ -83,17 +81,6 @@ export function DashboardTopBar() {
 
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/dashboard/settings"
-                  className="flex items-center gap-2"
-                >
-                  <User size={16} />
-                  Profile Settings
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
