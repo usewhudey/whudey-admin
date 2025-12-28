@@ -49,25 +49,25 @@ const menuItems = [
     href: '/dashboard/analytics',
     subItems: null,
   },
+  // {
+  //   label: 'Store Settings',
+  //   icon: Paintbrush,
+  //   href: '/dashboard/store-settings',
+  //   subItems: [
+  //     {
+  //       label: 'Store Settings',
+  //       href: '/dashboard/store-settings/store',
+  //     },
+  //     {
+  //       label: 'Product Categories',
+  //       href: '/dashboard/store-settings/category',
+  //     },
+  //   ],
+  // },
   {
-    label: 'Store Settings',
-    icon: Paintbrush,
-    href: '/dashboard/store-settings',
-    subItems: [
-      {
-        label: 'Store Settings',
-        href: '/dashboard/store-settings/store',
-      },
-      {
-        label: 'Product Categories',
-        href: '/dashboard/store-settings/category',
-      },
-    ],
-  },
-  {
-    label: 'Activities',
+    label: 'Reports',
     icon: Activity,
-    href: '/dashboard/activities',
+    href: '/dashboard/reports',
     subItems: null,
   },
   {

@@ -32,6 +32,9 @@ export const baseApi = createApi({
     'TrafficSources',
     'Geographic',
     'ProductCategories',
+    'ReportStats',
+    'Reports',
+    'ReportDetails',
   ],
   endpoints: () => ({}),
 });
