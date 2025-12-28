@@ -1,0 +1,41 @@
+name: Deploy to Vercel (Production)
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Upgraded from 18 for better React 19 support
+
+      - name: Install dependencies
+        # Added --legacy-peer-deps to bypass the cmdk/react-19 conflict
+        run: npm install --legacy-peer-deps
+
+      - name: Prepare Vercel project file
+        run: |
+          mkdir -p .vercel
+          cat > .vercel/project.json << EOF
+          {"orgId": "${{ secrets.VERCEL_ORG_ID }}", "projectId": "${{ secrets.VERCEL_PROJECT_MASTER_ID}}"}
+          EOF
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel (Production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npx vercel --prod --yes --token "$VERCEL_TOKEN"
