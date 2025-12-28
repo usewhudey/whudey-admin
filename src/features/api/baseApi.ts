@@ -35,6 +35,9 @@ export const baseApi = createApi({
     'ReportStats',
     'Reports',
     'ReportDetails',
+    'Admin',
+    'AdminDetails',
+    'AdminActivities',
   ],
   endpoints: () => ({}),
 });

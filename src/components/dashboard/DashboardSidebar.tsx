@@ -49,6 +49,7 @@ const menuItems = [
     href: '/dashboard/analytics',
     subItems: null,
   },
+
   // {
   //   label: 'Store Settings',
   //   icon: Paintbrush,
@@ -68,6 +69,12 @@ const menuItems = [
     label: 'Reports',
     icon: Activity,
     href: '/dashboard/reports',
+    subItems: null,
+  },
+  {
+    label: 'Admins',
+    icon: Settings,
+    href: '/dashboard/admins',
     subItems: null,
   },
   {
