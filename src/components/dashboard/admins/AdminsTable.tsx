@@ -161,7 +161,7 @@ export default function AdminsTable({
                   {new Date(admin.createdAt).toLocaleDateString()}
                 </td>
 
-                {user.role === 'superadmin' && (
+                {user?.role === 'superadmin' && (
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="relative">
                       <button
