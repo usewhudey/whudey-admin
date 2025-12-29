@@ -5,7 +5,11 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useGetAdminByIdQuery, useToggleAdminStatusMutation, useChangeAdminToSellerMutation } from '@/features/admins/adminsApi';
+import {
+  useGetAdminByIdQuery,
+  useToggleAdminStatusMutation,
+  useChangeAdminToSellerMutation,
+} from '@/features/admins/adminsApi';
 import { AdminStatus, AdminRole } from '@/types/admin';
 import { formatDistanceToNow } from 'date-fns';
 import {
@@ -33,14 +37,18 @@ export default function AdminDetailPage() {
   const adminId = params.id as string;
 
   const { data, isLoading, error } = useGetAdminByIdQuery(adminId);
-  const [toggleStatus, { isLoading: isTogglingStatus }] = useToggleAdminStatusMutation();
-  const [changeToSeller, { isLoading: isChangingRole }] = useChangeAdminToSellerMutation();
+  const [toggleStatus, { isLoading: isTogglingStatus }] =
+    useToggleAdminStatusMutation();
+  const [changeToSeller, { isLoading: isChangingRole }] =
+    useChangeAdminToSellerMutation();
 
   const handleToggleStatus = async () => {
     if (!data?.data.admin) return;
     try {
       const newStatus =
-        data.data.admin.status === AdminStatus.ACTIVE ? AdminStatus.SUSPENDED : AdminStatus.ACTIVE;
+        data.data.admin.status === AdminStatus.ACTIVE
+          ? AdminStatus.SUSPENDED
+          : AdminStatus.ACTIVE;
       await toggleStatus({
         adminId,
         payload: { status: newStatus },
@@ -54,7 +62,11 @@ export default function AdminDetailPage() {
   };
 
   const handleChangeToSeller = async () => {
-    if (!confirm('Are you sure you want to change this admin to a seller? This action cannot be undone.')) {
+    if (
+      !confirm(
+        'Are you sure you want to change this admin to a seller? This action cannot be undone.'
+      )
+    ) {
       return;
     }
     try {
@@ -78,8 +90,13 @@ export default function AdminDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 font-medium">Failed to load admin details</p>
-          <Link href="/dashboard/admins" className="text-sm text-blue-600 hover:underline mt-2 inline-block">
+          <p className="text-red-600 font-medium">
+            Failed to load admin details
+          </p>
+          <Link
+            href="/dashboard/admins"
+            className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+          >
             Back to Admins
           </Link>
         </div>
@@ -125,17 +142,40 @@ export default function AdminDetailPage() {
 
   const getActionBadge = (action: string) => {
     const actionMap: Record<string, { color: string; label: string }> = {
-      resolved: { color: 'bg-green-100 text-green-800', label: 'Resolved Report' },
-      suspend_seller: { color: 'bg-red-100 text-red-800', label: 'Suspended Seller' },
-      unsuspend_seller: { color: 'bg-blue-100 text-blue-800', label: 'Unsuspended Seller' },
-      promoted_to_admin: { color: 'bg-purple-100 text-purple-800', label: 'Promoted to Admin' },
-      grant_subscription: { color: 'bg-green-100 text-green-800', label: 'Granted Subscription' },
-      reset_seller_password: { color: 'bg-yellow-100 text-yellow-800', label: 'Reset Password' },
+      resolved: {
+        color: 'bg-green-100 text-green-800',
+        label: 'Resolved Report',
+      },
+      suspend_seller: {
+        color: 'bg-red-100 text-red-800',
+        label: 'Suspended Seller',
+      },
+      unsuspend_seller: {
+        color: 'bg-blue-100 text-blue-800',
+        label: 'Unsuspended Seller',
+      },
+      promoted_to_admin: {
+        color: 'bg-purple-100 text-purple-800',
+        label: 'Promoted to Admin',
+      },
+      grant_subscription: {
+        color: 'bg-green-100 text-green-800',
+        label: 'Granted Subscription',
+      },
+      reset_seller_password: {
+        color: 'bg-yellow-100 text-yellow-800',
+        label: 'Reset Password',
+      },
     };
 
-    const config = actionMap[action] || { color: 'bg-gray-100 text-gray-800', label: action };
+    const config = actionMap[action] || {
+      color: 'bg-gray-100 text-gray-800',
+      label: action,
+    };
     return (
-      <span className={`px-2 py-0.5 rounded text-xs font-medium ${config.color}`}>
+      <span
+        className={`px-2 py-0.5 rounded text-xs font-medium ${config.color}`}
+      >
         {config.label}
       </span>
     );
@@ -170,7 +210,9 @@ export default function AdminDetailPage() {
             ) : (
               <CheckCircle className="w-4 h-4" />
             )}
-            {admin.status === AdminStatus.ACTIVE ? 'Suspend Admin' : 'Activate Admin'}
+            {admin.status === AdminStatus.ACTIVE
+              ? 'Suspend Admin'
+              : 'Activate Admin'}
           </button>
 
           <button
@@ -178,7 +220,11 @@ export default function AdminDetailPage() {
             disabled={isChangingRole}
             className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
           >
-            {isChangingRole ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserX className="w-4 h-4" />}
+            {isChangingRole ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <UserX className="w-4 h-4" />
+            )}
             Change to Seller
           </button>
         </div>
@@ -187,14 +233,6 @@ export default function AdminDetailPage() {
       {/* Admin Info Card */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-start gap-6">
-          {admin.avatar ? (
-            <img src={admin.avatar} alt={admin.firstName} className="w-24 h-24 rounded-full" />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
-              {admin.firstName[0].toUpperCase()}
-            </div>
-          )}
-
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold text-gray-900">
@@ -217,12 +255,17 @@ export default function AdminDetailPage() {
               )}
               <div className="flex items-center gap-2 text-gray-600">
                 <Calendar className="w-4 h-4" />
-                <span className="text-sm">Joined {new Date(admin.createdAt).toLocaleDateString()}</span>
+                <span className="text-sm">
+                  Joined {new Date(admin.createdAt).toLocaleDateString()}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <Clock className="w-4 h-4" />
                 <span className="text-sm">
-                  Last login {formatDistanceToNow(new Date(admin.lastLoginAt), { addSuffix: true })}
+                  Last login{' '}
+                  {formatDistanceToNow(new Date(admin.lastLoginAt), {
+                    addSuffix: true,
+                  })}
                 </span>
               </div>
             </div>
@@ -241,7 +284,9 @@ export default function AdminDetailPage() {
 
         <div className="divide-y divide-gray-200">
           {recentActivities.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">No recent activities</div>
+            <div className="p-6 text-center text-gray-500">
+              No recent activities
+            </div>
           ) : (
             recentActivities.map(activity => (
               <div key={activity.id} className="p-6 hover:bg-gray-50">
@@ -249,11 +294,15 @@ export default function AdminDetailPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-sm text-gray-500">
-                        {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(activity.createdAt), {
+                          addSuffix: true,
+                        })}
                       </span>
                     </div>
 
-                    <p className="text-sm text-gray-700 mb-3">{activity.description}</p>
+                    <p className="text-sm text-gray-700 mb-3">
+                      {activity.description}
+                    </p>
 
                     <div className="flex items-center gap-3 flex-wrap">
                       {getActionBadge(activity.action)}
@@ -273,23 +322,30 @@ export default function AdminDetailPage() {
                       )} */}
                     </div>
 
-                    {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                        <p className="text-xs font-medium text-gray-500 mb-1">Additional Details:</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {Object.entries(activity.metadata).map(([key, value]) => (
-                            <div key={key} className="text-xs">
-                              <span className="text-gray-500 capitalize">
-                                {key.replace(/([A-Z])/g, ' $1').trim()}:
-                              </span>
-                              <span className="text-gray-900 ml-1">
-                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                              </span>
-                            </div>
-                          ))}
+                    {activity.metadata &&
+                      Object.keys(activity.metadata).length > 0 && (
+                        <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                          <p className="text-xs font-medium text-gray-500 mb-1">
+                            Additional Details:
+                          </p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {Object.entries(activity.metadata).map(
+                              ([key, value]) => (
+                                <div key={key} className="text-xs">
+                                  <span className="text-gray-500 capitalize">
+                                    {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                  </span>
+                                  <span className="text-gray-900 ml-1">
+                                    {typeof value === 'object'
+                                      ? JSON.stringify(value)
+                                      : String(value)}
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 </div>
               </div>
