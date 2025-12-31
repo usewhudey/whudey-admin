@@ -16,6 +16,7 @@ import {
   BulkEmailResponse,
   ResetPasswordResponse,
   MakeAdminResponse,
+  WarnSellerResponse,
 } from '@/types/seller';
 
 export const sellersApi = baseApi.injectEndpoints({
@@ -54,6 +55,14 @@ export const sellersApi = baseApi.injectEndpoints({
     unsuspendSeller: builder.mutation<UnsuspendSellerResponse, string>({
       query: sellerId => ({
         url: `/admin/seller/${sellerId}/unsuspend`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Sellers', 'SellerDetails'],
+    }),
+    // Warn seller
+    warnSeller: builder.mutation<WarnSellerResponse, string>({
+      query: sellerId => ({
+        url: `/admin/seller/${sellerId}/warn`,
         method: 'POST',
       }),
       invalidatesTags: ['Sellers', 'SellerDetails'],
@@ -114,6 +123,7 @@ export const {
   useGetSellerDetailsQuery,
   useSuspendSellerMutation,
   useUnsuspendSellerMutation,
+  useWarnSellerMutation,
   useDeleteSellerMutation,
   useGrantSubscriptionMutation,
   useSendBulkEmailMutation,
