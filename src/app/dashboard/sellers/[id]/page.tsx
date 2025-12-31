@@ -11,6 +11,7 @@ import {
   useResetSellerPasswordMutation,
   useMakeAdminMutation,
   useGrantSubscriptionMutation,
+  useWarnSellerMutation,
 } from '@/features/sellers/sellersApi';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,7 @@ import { SuspendSellerModal } from '@/components/dashboard/sellers/modals/Suspen
 import { ConfirmModal } from '@/components/dashboard/sellers/modals/ConfirmModal';
 import { GrantSubscriptionModal } from '@/components/dashboard/sellers/modals/GrantSubscriptionModal';
 import { useAuth } from '@/hooks/useAuth';
+import { set } from 'zod';
 
 export default function SellerDetailsPage() {
   const { user } = useAuth();
@@ -53,6 +55,7 @@ export default function SellerDetailsPage() {
   const [suspendModal, setSuspendModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [unsuspendModal, setUnsuspendModal] = useState(false);
+  const [warnModal, setWarnModal] = useState(false);
   const [resetPasswordModal, setResetPasswordModal] = useState(false);
   const [makeAdminModal, setMakeAdminModal] = useState(false);
   const [grantSubscriptionModal, setGrantSubscriptionModal] = useState(false);
@@ -69,6 +72,9 @@ export default function SellerDetailsPage() {
   const [makeAdmin, { isLoading: isMakingAdmin }] = useMakeAdminMutation();
   const [grantSubscription, { isLoading: isGranting }] =
     useGrantSubscriptionMutation();
+
+  // warn
+  const [warnSeller, { isLoading: isWarning }] = useWarnSellerMutation();
 
   const handleSuspendConfirm = async (reason: string, duration: string) => {
     try {
@@ -90,6 +96,15 @@ export default function SellerDetailsPage() {
       setUnsuspendModal(false);
     } catch (err) {
       showError('Failed to unsuspend seller');
+    }
+  };
+  const handleWarnConfirm = async () => {
+    try {
+      await warnSeller(sellerId).unwrap();
+      success('Seller warned successfully');
+      setWarnModal(false);
+    } catch (err) {
+      showError('Failed to warn seller');
     }
   };
 
@@ -198,7 +213,23 @@ export default function SellerDetailsPage() {
                   Unsuspend
                 </Button>
               )}
+              {user?.role === 'superadmin' && (
+                <Button
+                  variant="outline"
+                  onClick={() => setWarnModal(true)}
+                  className="text-yellow-600 hover:text-purple-700"
+                >
+                  Warn Seller
+                </Button>
+              )}
 
+              {/* <Button
+                variant="outline"
+                onClick={() => setGrantSubscriptionModal(true)}
+                className="text-purple-600 hover:text-purple-700"
+              >
+                Message Seller
+              </Button> */}
               <Button
                 variant="outline"
                 onClick={() => setGrantSubscriptionModal(true)}
@@ -532,7 +563,18 @@ export default function SellerDetailsPage() {
         isLoading={isDeleting}
         sellerName={`${seller.firstName} ${seller.lastName}`}
       />
+      {/* here for warn !!! */}
+      <ConfirmModal
+        isOpen={warnModal}
+        onClose={() => setWarnModal(false)}
+        onConfirm={handleWarnConfirm}
+        isLoading={isWarning}
+        title="Warn Seller"
+        message="Are you sure you want to warn this seller? this action will send a warning email to the seller."
+        confirmText="Warn Seller"
+      />
 
+      {/* for warning seller */}
       <ConfirmModal
         isOpen={unsuspendModal}
         onClose={() => setUnsuspendModal(false)}

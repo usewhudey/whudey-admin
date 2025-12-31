@@ -158,6 +158,17 @@ export interface UnsuspendSellerResponse {
   };
 }
 
+export interface WarnSellerResponse {
+  message: string;
+  seller: {
+    _id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+  };
+}
+
 export interface GrantSubscriptionParams {
   tier: 'free' | 'paid' | 'premium';
   months: number;
